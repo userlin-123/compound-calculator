@@ -1,0 +1,647 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>예금 이자 계산기 | 예치금과 금리로 만기 금액 계산</title>
+
+    <meta name="description"
+          content="예치 금액, 예금 기간, 연 이자율을 입력하면 세전 이자, 세금, 세후 이자와 예상 만기 수령액을 계산해주는 무료 예금 이자 계산기입니다.">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            color: #222;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 30px 16px 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            margin: 0 0 10px;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.07);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 52px;
+            border: 1px solid #d9dce3;
+            border-radius: 10px;
+            padding: 0 55px 0 15px;
+            font-size: 17px;
+            outline: none;
+            background: white;
+        }
+
+        select {
+            padding: 0 12px;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            font-size: 14px;
+        }
+
+        .calculate-button {
+            width: 100%;
+            height: 56px;
+            margin-top: 5px;
+            border: 0;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .calculate-button:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            display: none;
+            margin-top: 28px;
+        }
+
+        .main-result {
+            padding: 24px;
+            border-radius: 14px;
+            background: #eff6ff;
+            margin-bottom: 12px;
+        }
+
+        .main-result .label {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 7px;
+        }
+
+        .main-result .amount {
+            color: #2563eb;
+            font-size: 30px;
+            font-weight: 800;
+            word-break: break-all;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .result-box {
+            padding: 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        .result-box .label {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .result-box .value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .info {
+            margin-top: 32px;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .info h2 {
+            margin: 28px 0 8px;
+            font-size: 20px;
+            color: #222;
+        }
+
+        .notice {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #777;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 12px 40px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 27px;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-result .amount {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="header">
+
+        <h1>예금 이자 계산기</h1>
+
+        <p>
+            예치 금액과 기간, 금리를 입력하고<br>
+            예상 만기 수령액을 계산해보세요.
+        </p>
+
+    </header>
+
+
+    <main class="card">
+
+        <div class="input-group">
+
+            <label for="principal">
+                예치 금액
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="principal"
+                    value="10000000"
+                    min="0"
+                    step="10000"
+                    placeholder="예: 10000000"
+                >
+
+                <span class="unit">원</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="months">
+                예치 기간
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="months"
+                    value="12"
+                    min="1"
+                    max="1200"
+                    step="1"
+                    placeholder="예: 12"
+                >
+
+                <span class="unit">개월</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="rate">
+                연 이자율
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="rate"
+                    value="3"
+                    min="0"
+                    step="0.01"
+                    placeholder="예: 3"
+                >
+
+                <span class="unit">%</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="tax">
+                이자 과세
+            </label>
+
+            <select id="tax">
+
+                <option value="normal">
+                    일반과세 (15.4%)
+                </option>
+
+                <option value="none">
+                    비과세 (0%)
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            class="calculate-button"
+            onclick="calculate()"
+        >
+            예금 이자 계산하기
+        </button>
+
+
+        <section
+            class="result"
+            id="result"
+        >
+
+            <div class="main-result">
+
+                <div class="label">
+                    예상 만기 수령액
+                </div>
+
+                <div
+                    class="amount"
+                    id="finalAmount"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="result-grid">
+
+                <div class="result-box">
+
+                    <div class="label">
+                        예치 원금
+                    </div>
+
+                    <div
+                        class="value"
+                        id="principalResult"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        세전 이자
+                    </div>
+
+                    <div
+                        class="value"
+                        id="interestBeforeTax"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        이자 세금
+                    </div>
+
+                    <div
+                        class="value"
+                        id="taxAmount"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        세후 이자
+                    </div>
+
+                    <div
+                        class="value"
+                        id="interestAfterTax"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <a
+            href="index.html"
+            class="back-link"
+        >
+            복리 계산기로 이동하기 →
+        </a>
+
+
+        <section class="info">
+
+            <h2>
+                예금 이자 계산기란?
+            </h2>
+
+            <p>
+                예금 이자 계산기는 일정 금액을 금융기관에 예치했을 때
+                예상되는 이자와 만기 수령액을 계산하는 도구입니다.
+            </p>
+
+
+            <h2>
+                예금 이자는 어떻게 계산되나요?
+            </h2>
+
+            <p>
+                본 계산기는 예치한 원금에 연 이자율을 적용하여
+                예상 세전 이자를 계산합니다.
+                실제 금융상품의 이자 계산 방식은 상품의 조건에 따라
+                달라질 수 있습니다.
+            </p>
+
+
+            <h2>
+                세후 이자는 무엇인가요?
+            </h2>
+
+            <p>
+                세후 이자는 이자소득에 대한 세금을 제외하고
+                실제로 받을 것으로 예상되는 이자를 의미합니다.
+                일반과세를 선택하면 이자에 15.4%의 세율을 적용합니다.
+            </p>
+
+        </section>
+
+
+        <div class="notice">
+
+            본 계산기는 예상 금액을 확인하기 위한 참고용 도구입니다.
+            실제 금융상품의 이자 계산 방식과 만기 금액은 금융기관,
+            상품 조건 및 세금 적용 여부에 따라 달라질 수 있습니다.
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+function formatMoney(number) {
+
+    return Math.round(number).toLocaleString("ko-KR") + "원";
+
+}
+
+
+function calculate() {
+
+    const principal =
+        Number(document.getElementById("principal").value);
+
+    const months =
+        Number(document.getElementById("months").value);
+
+    const rate =
+        Number(document.getElementById("rate").value);
+
+    const taxType =
+        document.getElementById("tax").value;
+
+
+    if (
+        !Number.isFinite(principal) ||
+        !Number.isFinite(months) ||
+        !Number.isFinite(rate)
+    ) {
+
+        alert("모든 항목을 입력해주세요.");
+        return;
+
+    }
+
+
+    if (principal < 0) {
+
+        alert("예치 금액은 0원 이상이어야 합니다.");
+        return;
+
+    }
+
+
+    if (months <= 0) {
+
+        alert("예치 기간은 1개월 이상이어야 합니다.");
+        return;
+
+    }
+
+
+    if (rate < 0) {
+
+        alert("이자율은 0% 이상이어야 합니다.");
+        return;
+
+    }
+
+
+    const annualRate =
+        rate / 100;
+
+
+    const years =
+        months / 12;
+
+
+    /*
+        단리 기준 예금 이자 계산
+
+        원금 × 연 이자율 × 예치기간(년)
+    */
+
+    const interestBeforeTax =
+        principal *
+        annualRate *
+        years;
+
+
+    let taxRate = 0;
+
+
+    if (taxType === "normal") {
+
+        taxRate = 0.154;
+
+    }
+
+
+    const taxAmount =
+        interestBeforeTax * taxRate;
+
+
+    const interestAfterTax =
+        interestBeforeTax - taxAmount;
+
+
+    const finalAmount =
+        principal + interestAfterTax;
+
+
+    document.getElementById(
+        "finalAmount"
+    ).textContent =
+        formatMoney(finalAmount);
+
+
+    document.getElementById(
+        "principalResult"
+    ).textContent =
+        formatMoney(principal);
+
+
+    document.getElementById(
+        "interestBeforeTax"
+    ).textContent =
+        formatMoney(interestBeforeTax);
+
+
+    document.getElementById(
+        "taxAmount"
+    ).textContent =
+        formatMoney(taxAmount);
+
+
+    document.getElementById(
+        "interestAfterTax"
+    ).textContent =
+        formatMoney(interestAfterTax);
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "block";
+
+}
+
+
+window.addEventListener(
+    "DOMContentLoaded",
+    calculate
+);
+
+</script>
+
+</body>
+</html>
+```

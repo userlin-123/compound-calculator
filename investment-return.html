@@ -1,0 +1,624 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>투자 수익률 계산기 | 수익금과 연평균 수익률 계산</title>
+
+    <meta name="description"
+          content="투자 원금과 최종 금액, 투자 기간을 입력하여 투자 수익금과 총 수익률, 연평균 수익률을 계산해보세요.">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            color: #222;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 16px 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            margin: 0 0 10px;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.07);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            height: 52px;
+            border: 1px solid #d9dce3;
+            border-radius: 10px;
+            padding: 0 55px 0 15px;
+            font-size: 17px;
+            outline: none;
+            background: white;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            font-size: 14px;
+        }
+
+        .calculate-button {
+            width: 100%;
+            height: 56px;
+            border: 0;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .calculate-button:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            display: none;
+            margin-top: 28px;
+        }
+
+        .main-result {
+            padding: 24px;
+            border-radius: 14px;
+            background: #eff6ff;
+            margin-bottom: 12px;
+        }
+
+        .main-result .label {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 7px;
+        }
+
+        .main-result .amount {
+            color: #2563eb;
+            font-size: 30px;
+            font-weight: 800;
+            word-break: break-all;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .result-box {
+            padding: 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        .result-box .label {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .result-box .value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .info {
+            margin-top: 32px;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .info h2 {
+            margin: 28px 0 8px;
+            font-size: 20px;
+            color: #222;
+        }
+
+        .notice {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #777;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 12px 40px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 27px;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-result .amount {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="header">
+
+        <h1>투자 수익률 계산기</h1>
+
+        <p>
+            투자 원금과 최종 금액을 입력하여<br>
+            총 수익률과 연평균 수익률을 계산해보세요.
+        </p>
+
+    </header>
+
+
+    <main class="card">
+
+        <div class="input-group">
+
+            <label for="initialAmount">
+                투자 원금
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="initialAmount"
+                    value="10000000"
+                    min="1"
+                    step="10000"
+                    placeholder="예: 10000000"
+                >
+
+                <span class="unit">원</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="finalAmount">
+                최종 투자금액
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="finalAmount"
+                    value="15000000"
+                    min="0"
+                    step="10000"
+                    placeholder="예: 15000000"
+                >
+
+                <span class="unit">원</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="years">
+                투자 기간
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="years"
+                    value="3"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="예: 3"
+                >
+
+                <span class="unit">년</span>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="calculate-button"
+            onclick="calculate()"
+        >
+            투자 수익률 계산하기
+        </button>
+
+
+        <section
+            class="result"
+            id="result"
+        >
+
+            <div class="main-result">
+
+                <div class="label">
+                    총 수익금
+                </div>
+
+                <div
+                    class="amount"
+                    id="profit"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="result-grid">
+
+                <div class="result-box">
+
+                    <div class="label">
+                        투자 원금
+                    </div>
+
+                    <div
+                        class="value"
+                        id="initialResult"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        최종 투자금액
+                    </div>
+
+                    <div
+                        class="value"
+                        id="finalResult"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        총 수익률
+                    </div>
+
+                    <div
+                        class="value"
+                        id="totalReturn"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        연평균 수익률
+                    </div>
+
+                    <div
+                        class="value"
+                        id="cagr"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <a
+            href="index.html"
+            class="back-link"
+        >
+            복리 계산기로 이동하기 →
+        </a>
+
+
+        <section class="info">
+
+            <h2>
+                투자 수익률이란?
+            </h2>
+
+            <p>
+                투자 수익률은 투자한 원금에 비해 최종적으로
+                얼마만큼의 수익 또는 손실이 발생했는지를
+                백분율로 나타낸 것입니다.
+            </p>
+
+
+            <h2>
+                연평균 수익률이란?
+            </h2>
+
+            <p>
+                투자 기간이 여러 해인 경우 단순히 총 수익률만
+                비교하기 어렵습니다. 연평균 수익률(CAGR)을 이용하면
+                투자 기간을 고려하여 연간 복리 기준의 수익률을
+                확인할 수 있습니다.
+            </p>
+
+
+            <h2>
+                계산 예시
+            </h2>
+
+            <p>
+                1,000만원을 투자하여 3년 후 1,500만원이 되었다면
+                총 수익금은 500만원입니다. 총 수익률은 50%이며,
+                연평균 수익률은 약 14.47%입니다.
+            </p>
+
+        </section>
+
+
+        <div class="notice">
+
+            본 계산기는 투자 수익률을 계산하기 위한 참고용 도구입니다.
+            실제 투자 수익은 세금, 수수료, 배당금 및 투자 시점 등에
+            따라 달라질 수 있습니다.
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+function formatMoney(number) {
+
+    return Math.round(number).toLocaleString("ko-KR") + "원";
+
+}
+
+
+function formatPercent(number) {
+
+    return number.toFixed(2) + "%";
+
+}
+
+
+function calculate() {
+
+    const initialAmount =
+        Number(
+            document.getElementById(
+                "initialAmount"
+            ).value
+        );
+
+
+    const finalAmount =
+        Number(
+            document.getElementById(
+                "finalAmount"
+            ).value
+        );
+
+
+    const years =
+        Number(
+            document.getElementById(
+                "years"
+            ).value
+        );
+
+
+    if (
+        !Number.isFinite(initialAmount) ||
+        !Number.isFinite(finalAmount) ||
+        !Number.isFinite(years)
+    ) {
+
+        alert("모든 항목을 입력해주세요.");
+        return;
+
+    }
+
+
+    if (initialAmount <= 0) {
+
+        alert("투자 원금은 0보다 커야 합니다.");
+        return;
+
+    }
+
+
+    if (finalAmount < 0) {
+
+        alert("최종 투자금액은 0원 이상이어야 합니다.");
+        return;
+
+    }
+
+
+    if (years <= 0) {
+
+        alert("투자 기간은 0보다 커야 합니다.");
+        return;
+
+    }
+
+
+    const profit =
+        finalAmount -
+        initialAmount;
+
+
+    const totalReturn =
+        (profit / initialAmount) * 100;
+
+
+    let cagr;
+
+
+    if (finalAmount === 0) {
+
+        cagr = -100;
+
+    } else {
+
+        cagr =
+            (
+                Math.pow(
+                    finalAmount / initialAmount,
+                    1 / years
+                ) - 1
+            ) * 100;
+
+    }
+
+
+    document.getElementById(
+        "profit"
+    ).textContent =
+        formatMoney(profit);
+
+
+    document.getElementById(
+        "initialResult"
+    ).textContent =
+        formatMoney(initialAmount);
+
+
+    document.getElementById(
+        "finalResult"
+    ).textContent =
+        formatMoney(finalAmount);
+
+
+    document.getElementById(
+        "totalReturn"
+    ).textContent =
+        formatPercent(totalReturn);
+
+
+    document.getElementById(
+        "cagr"
+    ).textContent =
+        formatPercent(cagr);
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "block";
+
+}
+
+
+window.addEventListener(
+    "DOMContentLoaded",
+    calculate
+);
+
+</script>
+
+</body>
+</html>
+```

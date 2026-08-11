@@ -1,0 +1,894 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>주택담보대출 계산기 | 월 상환액과 총 이자 계산</title>
+
+    <meta name="description"
+          content="주택담보대출 금액, 기간, 금리와 상환방식을 입력하여 월 상환액, 총 이자와 총 상환액을 계산해보세요.">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            color: #222;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 16px 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            margin: 0 0 10px;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.07);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 52px;
+            border: 1px solid #d9dce3;
+            border-radius: 10px;
+            padding: 0 55px 0 15px;
+            font-size: 17px;
+            outline: none;
+            background: white;
+        }
+
+        select {
+            padding: 0 12px;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            font-size: 14px;
+        }
+
+        .calculate-button {
+            width: 100%;
+            height: 56px;
+            border: 0;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .calculate-button:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            display: none;
+            margin-top: 28px;
+        }
+
+        .main-result {
+            padding: 24px;
+            border-radius: 14px;
+            background: #eff6ff;
+            margin-bottom: 12px;
+        }
+
+        .main-result .label {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 7px;
+        }
+
+        .main-result .amount {
+            color: #2563eb;
+            font-size: 30px;
+            font-weight: 800;
+            word-break: break-all;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .result-box {
+            padding: 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        .result-box .label {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .result-box .value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .comparison {
+            margin-top: 24px;
+            overflow-x: auto;
+        }
+
+        .comparison h2 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 520px;
+        }
+
+        th,
+        td {
+            padding: 13px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: right;
+        }
+
+        th:first-child,
+        td:first-child {
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+            font-size: 14px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .info {
+            margin-top: 32px;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .info h2 {
+            margin: 28px 0 8px;
+            font-size: 20px;
+            color: #222;
+        }
+
+        .notice {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #777;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 12px 40px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 27px;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-result .amount {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="header">
+
+        <h1>주택담보대출 계산기</h1>
+
+        <p>
+            대출금액과 기간, 금리를 입력하고<br>
+            예상 월 상환액과 총 이자를 계산해보세요.
+        </p>
+
+    </header>
+
+
+    <main class="card">
+
+        <div class="input-group">
+
+            <label for="loanAmount">
+                주택담보대출 금액
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="loanAmount"
+                    value="300000000"
+                    min="0"
+                    step="100000"
+                    placeholder="예: 300000000"
+                >
+
+                <span class="unit">원</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="loanMonths">
+                대출기간
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="loanMonths"
+                    value="360"
+                    min="1"
+                    max="600"
+                    step="1"
+                    placeholder="예: 360"
+                >
+
+                <span class="unit">개월</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="loanRate">
+                연 이자율
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="loanRate"
+                    value="3.5"
+                    min="0"
+                    step="0.01"
+                    placeholder="예: 3.5"
+                >
+
+                <span class="unit">%</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="method">
+                상환방식
+            </label>
+
+            <select id="method">
+
+                <option value="equal">
+                    원리금균등상환
+                </option>
+
+                <option value="principal">
+                    원금균등상환
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            class="calculate-button"
+            onclick="calculate()"
+        >
+            주택담보대출 계산하기
+        </button>
+
+
+        <section
+            class="result"
+            id="result"
+        >
+
+            <div class="main-result">
+
+                <div class="label">
+                    첫 달 예상 상환액
+                </div>
+
+                <div
+                    class="amount"
+                    id="monthlyPayment"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="result-grid">
+
+                <div class="result-box">
+
+                    <div class="label">
+                        총 상환액
+                    </div>
+
+                    <div
+                        class="value"
+                        id="totalPayment"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        총 이자
+                    </div>
+
+                    <div
+                        class="value"
+                        id="totalInterest"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="comparison">
+
+                <h2>
+                    상환방식 비교
+                </h2>
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>항목</th>
+                            <th>원리금균등</th>
+                            <th>원금균등</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>첫 달 상환액</td>
+                            <td id="equalFirst">-</td>
+                            <td id="principalFirst">-</td>
+                        </tr>
+
+                        <tr>
+                            <td>마지막 달 상환액</td>
+                            <td id="equalLast">-</td>
+                            <td id="principalLast">-</td>
+                        </tr>
+
+                        <tr>
+                            <td>총 이자</td>
+                            <td id="equalInterest">-</td>
+                            <td id="principalInterest">-</td>
+                        </tr>
+
+                        <tr>
+                            <td>총 상환액</td>
+                            <td id="equalTotal">-</td>
+                            <td id="principalTotal">-</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <a
+            href="index.html"
+            class="back-link"
+        >
+            복리 계산기로 이동하기 →
+        </a>
+
+
+        <section class="info">
+
+            <h2>
+                주택담보대출 계산기란?
+            </h2>
+
+            <p>
+                주택담보대출 계산기는 대출금액과 금리,
+                대출기간을 바탕으로 예상 상환액과 총 이자를
+                계산하는 도구입니다.
+            </p>
+
+
+            <h2>
+                원리금균등상환
+            </h2>
+
+            <p>
+                원금과 이자를 합한 금액을 매월 일정하게
+                상환하는 방식입니다. 초기에는 이자 비중이 높고
+                시간이 지나면서 원금 상환 비중이 높아집니다.
+            </p>
+
+
+            <h2>
+                원금균등상환
+            </h2>
+
+            <p>
+                매월 동일한 원금을 상환하고 남은 원금에 대한
+                이자를 추가로 납부하는 방식입니다.
+                일반적으로 시간이 지날수록 월 상환액이 감소합니다.
+            </p>
+
+        </section>
+
+
+        <div class="notice">
+
+            본 계산기는 예상 금액을 확인하기 위한 참고용 도구입니다.
+            실제 주택담보대출의 금리와 상환액은 금융기관,
+            상품조건, 금리 변동 여부 및 개인의 조건에 따라
+            달라질 수 있습니다.
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+function formatMoney(number) {
+
+    return Math.round(number).toLocaleString("ko-KR") + "원";
+
+}
+
+
+/* 원리금균등상환 */
+
+function calculateEqualPayment(
+    principal,
+    annualRate,
+    months
+) {
+
+    const monthlyRate =
+        annualRate / 12;
+
+
+    let payment;
+
+
+    if (monthlyRate === 0) {
+
+        payment =
+            principal / months;
+
+    } else {
+
+        payment =
+            principal *
+            monthlyRate *
+            Math.pow(
+                1 + monthlyRate,
+                months
+            ) /
+            (
+                Math.pow(
+                    1 + monthlyRate,
+                    months
+                ) - 1
+            );
+
+    }
+
+
+    const totalPayment =
+        payment * months;
+
+
+    const totalInterest =
+        totalPayment - principal;
+
+
+    return {
+
+        firstPayment: payment,
+
+        lastPayment: payment,
+
+        totalPayment: totalPayment,
+
+        totalInterest: totalInterest
+
+    };
+
+}
+
+
+/* 원금균등상환 */
+
+function calculateEqualPrincipal(
+    principal,
+    annualRate,
+    months
+) {
+
+    const monthlyRate =
+        annualRate / 12;
+
+
+    const principalPayment =
+        principal / months;
+
+
+    let totalInterest = 0;
+
+
+    const firstPayment =
+        principalPayment +
+        principal * monthlyRate;
+
+
+    const lastBalance =
+        principal -
+        principalPayment * (months - 1);
+
+
+    const lastPayment =
+        principalPayment +
+        lastBalance * monthlyRate;
+
+
+    for (
+        let i = 0;
+        i < months;
+        i++
+    ) {
+
+        const balance =
+            principal -
+            principalPayment * i;
+
+
+        totalInterest +=
+            balance * monthlyRate;
+
+    }
+
+
+    const totalPayment =
+        principal + totalInterest;
+
+
+    return {
+
+        firstPayment: firstPayment,
+
+        lastPayment: lastPayment,
+
+        totalPayment: totalPayment,
+
+        totalInterest: totalInterest
+
+    };
+
+}
+
+
+function calculate() {
+
+    const principal =
+        Number(
+            document.getElementById(
+                "loanAmount"
+            ).value
+        );
+
+
+    const months =
+        Number(
+            document.getElementById(
+                "loanMonths"
+            ).value
+        );
+
+
+    const rate =
+        Number(
+            document.getElementById(
+                "loanRate"
+            ).value
+        );
+
+
+    const method =
+        document.getElementById(
+            "method"
+        ).value;
+
+
+    if (
+        !Number.isFinite(principal) ||
+        !Number.isFinite(months) ||
+        !Number.isFinite(rate)
+    ) {
+
+        alert("모든 항목을 입력해주세요.");
+        return;
+
+    }
+
+
+    if (principal <= 0) {
+
+        alert("대출금액은 0보다 커야 합니다.");
+        return;
+
+    }
+
+
+    if (months <= 0) {
+
+        alert("대출기간은 1개월 이상이어야 합니다.");
+        return;
+
+    }
+
+
+    if (rate < 0) {
+
+        alert("이자율은 0% 이상이어야 합니다.");
+        return;
+
+    }
+
+
+    const annualRate =
+        rate / 100;
+
+
+    const equal =
+        calculateEqualPayment(
+            principal,
+            annualRate,
+            months
+        );
+
+
+    const equalPrincipal =
+        calculateEqualPrincipal(
+            principal,
+            annualRate,
+            months
+        );
+
+
+    const selected =
+        method === "equal"
+            ? equal
+            : equalPrincipal;
+
+
+    document.getElementById(
+        "monthlyPayment"
+    ).textContent =
+        formatMoney(
+            selected.firstPayment
+        );
+
+
+    document.getElementById(
+        "totalPayment"
+    ).textContent =
+        formatMoney(
+            selected.totalPayment
+        );
+
+
+    document.getElementById(
+        "totalInterest"
+    ).textContent =
+        formatMoney(
+            selected.totalInterest
+        );
+
+
+    document.getElementById(
+        "equalFirst"
+    ).textContent =
+        formatMoney(
+            equal.firstPayment
+        );
+
+
+    document.getElementById(
+        "equalLast"
+    ).textContent =
+        formatMoney(
+            equal.lastPayment
+        );
+
+
+    document.getElementById(
+        "equalInterest"
+    ).textContent =
+        formatMoney(
+            equal.totalInterest
+        );
+
+
+    document.getElementById(
+        "equalTotal"
+    ).textContent =
+        formatMoney(
+            equal.totalPayment
+        );
+
+
+    document.getElementById(
+        "principalFirst"
+    ).textContent =
+        formatMoney(
+            equalPrincipal.firstPayment
+        );
+
+
+    document.getElementById(
+        "principalLast"
+    ).textContent =
+        formatMoney(
+            equalPrincipal.lastPayment
+        );
+
+
+    document.getElementById(
+        "principalInterest"
+    ).textContent =
+        formatMoney(
+            equalPrincipal.totalInterest
+        );
+
+
+    document.getElementById(
+        "principalTotal"
+    ).textContent =
+        formatMoney(
+            equalPrincipal.totalPayment
+        );
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "block";
+
+}
+
+
+window.addEventListener(
+    "DOMContentLoaded",
+    calculate
+);
+
+</script>
+
+</body>
+</html>
+```

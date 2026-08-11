@@ -1,0 +1,613 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>연봉 월급 계산기 | 세전 세후 월급 계산</title>
+
+    <meta name="description"
+          content="연봉과 월급을 입력하여 세전 월급, 예상 세후 월급, 예상 공제액과 세후 연봉을 간편하게 계산해보세요.">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            color: #222;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 16px 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            margin: 0 0 10px;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.07);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 52px;
+            border: 1px solid #d9dce3;
+            border-radius: 10px;
+            padding: 0 55px 0 15px;
+            font-size: 17px;
+            outline: none;
+            background: white;
+        }
+
+        select {
+            padding: 0 12px;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            font-size: 14px;
+        }
+
+        .calculate-button {
+            width: 100%;
+            height: 56px;
+            border: 0;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .calculate-button:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            display: none;
+            margin-top: 28px;
+        }
+
+        .main-result {
+            padding: 24px;
+            border-radius: 14px;
+            background: #eff6ff;
+            margin-bottom: 12px;
+        }
+
+        .main-result .label {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 7px;
+        }
+
+        .main-result .amount {
+            color: #2563eb;
+            font-size: 30px;
+            font-weight: 800;
+            word-break: break-all;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .result-box {
+            padding: 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        .result-box .label {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .result-box .value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .info {
+            margin-top: 32px;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .info h2 {
+            margin: 28px 0 8px;
+            font-size: 20px;
+            color: #222;
+        }
+
+        .notice {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #777;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 12px 40px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 27px;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-result .amount {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="header">
+
+        <h1>연봉·월급 계산기</h1>
+
+        <p>
+            연봉을 입력하고 예상 월급과<br>
+            세후 실수령액을 간편하게 계산해보세요.
+        </p>
+
+    </header>
+
+
+    <main class="card">
+
+        <div class="input-group">
+
+            <label for="salary">
+                연봉
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="salary"
+                    value="40000000"
+                    min="0"
+                    step="100000"
+                    placeholder="예: 40000000"
+                >
+
+                <span class="unit">원</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="bonus">
+                연간 상여금
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="bonus"
+                    value="0"
+                    min="0"
+                    step="100000"
+                    placeholder="예: 5000000"
+                >
+
+                <span class="unit">원</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="deduction">
+                예상 공제율
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="deduction"
+                    value="10"
+                    min="0"
+                    max="50"
+                    step="0.1"
+                    placeholder="예: 10"
+                >
+
+                <span class="unit">%</span>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="calculate-button"
+            onclick="calculate()"
+        >
+            연봉 계산하기
+        </button>
+
+
+        <section
+            class="result"
+            id="result"
+        >
+
+            <div class="main-result">
+
+                <div class="label">
+                    예상 월 실수령액
+                </div>
+
+                <div
+                    class="amount"
+                    id="monthlyNet"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="result-grid">
+
+                <div class="result-box">
+
+                    <div class="label">
+                        세전 월급
+                    </div>
+
+                    <div
+                        class="value"
+                        id="monthlyGross"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        예상 월 공제액
+                    </div>
+
+                    <div
+                        class="value"
+                        id="monthlyDeduction"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        예상 세후 연봉
+                    </div>
+
+                    <div
+                        class="value"
+                        id="annualNet"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        연간 총 공제액
+                    </div>
+
+                    <div
+                        class="value"
+                        id="annualDeduction"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <a
+            href="index.html"
+            class="back-link"
+        >
+            복리 계산기로 이동하기 →
+        </a>
+
+
+        <section class="info">
+
+            <h2>
+                연봉 계산기란?
+            </h2>
+
+            <p>
+                연봉을 기준으로 세전 월급과 예상 공제액,
+                세후 월 실수령액을 간편하게 계산하는 도구입니다.
+            </p>
+
+
+            <h2>
+                어떻게 계산하나요?
+            </h2>
+
+            <p>
+                연봉과 상여금을 합산한 뒤 입력한 예상 공제율을
+                적용하여 세후 연봉과 월 실수령액을 계산합니다.
+            </p>
+
+
+            <h2>
+                실제 월급과 다른 이유
+            </h2>
+
+            <p>
+                실제 급여에서 빠지는 금액은 소득세, 지방소득세,
+                국민연금, 건강보험, 장기요양보험,
+                고용보험 및 각종 비과세 항목 등에 따라 달라집니다.
+            </p>
+
+        </section>
+
+
+        <div class="notice">
+
+            본 계산기는 간편한 예상 계산을 위한 도구입니다.
+            실제 실수령액은 근로자의 소득, 부양가족,
+            비과세 항목 및 각종 공제 조건에 따라 달라질 수 있습니다.
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+function formatMoney(number) {
+
+    return Math.round(number).toLocaleString("ko-KR") + "원";
+
+}
+
+
+function calculate() {
+
+    const salary =
+        Number(
+            document.getElementById(
+                "salary"
+            ).value
+        );
+
+
+    const bonus =
+        Number(
+            document.getElementById(
+                "bonus"
+            ).value
+        );
+
+
+    const deductionRate =
+        Number(
+            document.getElementById(
+                "deduction"
+            ).value
+        );
+
+
+    if (
+        !Number.isFinite(salary) ||
+        !Number.isFinite(bonus) ||
+        !Number.isFinite(deductionRate)
+    ) {
+
+        alert("모든 항목을 입력해주세요.");
+        return;
+
+    }
+
+
+    if (salary < 0 || bonus < 0) {
+
+        alert("금액은 0원 이상이어야 합니다.");
+        return;
+
+    }
+
+
+    if (
+        deductionRate < 0 ||
+        deductionRate > 50
+    ) {
+
+        alert("공제율은 0~50% 사이로 입력해주세요.");
+        return;
+
+    }
+
+
+    const annualGross =
+        salary + bonus;
+
+
+    const annualDeduction =
+        annualGross *
+        (deductionRate / 100);
+
+
+    const annualNet =
+        annualGross -
+        annualDeduction;
+
+
+    const monthlyGross =
+        annualGross / 12;
+
+
+    const monthlyDeduction =
+        annualDeduction / 12;
+
+
+    const monthlyNet =
+        annualNet / 12;
+
+
+    document.getElementById(
+        "monthlyNet"
+    ).textContent =
+        formatMoney(monthlyNet);
+
+
+    document.getElementById(
+        "monthlyGross"
+    ).textContent =
+        formatMoney(monthlyGross);
+
+
+    document.getElementById(
+        "monthlyDeduction"
+    ).textContent =
+        formatMoney(monthlyDeduction);
+
+
+    document.getElementById(
+        "annualNet"
+    ).textContent =
+        formatMoney(annualNet);
+
+
+    document.getElementById(
+        "annualDeduction"
+    ).textContent =
+        formatMoney(annualDeduction);
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "block";
+
+}
+
+
+window.addEventListener(
+    "DOMContentLoaded",
+    calculate
+);
+
+</script>
+
+</body>
+</html>
+```

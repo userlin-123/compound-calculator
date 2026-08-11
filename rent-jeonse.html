@@ -1,0 +1,826 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>월세 전세 비교 계산기 | 전세와 월세 비용 비교</title>
+
+    <meta name="description"
+          content="전세보증금, 월세보증금, 월세와 자금의 기회비용을 입력하여 전세와 월세의 예상 비용을 비교해보세요.">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            color: #222;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 30px 16px 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            margin: 0 0 10px;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.07);
+        }
+
+        .section-title {
+            margin: 28px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 20px;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            height: 52px;
+            border: 1px solid #d9dce3;
+            border-radius: 10px;
+            padding: 0 55px 0 15px;
+            font-size: 17px;
+            outline: none;
+            background: white;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            font-size: 14px;
+        }
+
+        .calculate-button {
+            width: 100%;
+            height: 56px;
+            border: 0;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .calculate-button:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .winner {
+            padding: 24px;
+            border-radius: 14px;
+            background: #eff6ff;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .winner .label {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .winner .amount {
+            color: #2563eb;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .winner .description {
+            margin-top: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .comparison {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 520px;
+        }
+
+        th,
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: right;
+        }
+
+        th:first-child,
+        td:first-child {
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+            font-size: 14px;
+        }
+
+        td {
+            font-size: 15px;
+        }
+
+        .info {
+            margin-top: 32px;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .info h2 {
+            margin: 28px 0 8px;
+            font-size: 20px;
+            color: #222;
+        }
+
+        .notice {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #777;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 12px 40px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 27px;
+            }
+
+            .winner .amount {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="header">
+
+        <h1>월세·전세 비교 계산기</h1>
+
+        <p>
+            전세와 월세 조건을 입력하고<br>
+            1년 동안 예상되는 비용을 비교해보세요.
+        </p>
+
+    </header>
+
+
+    <main class="card">
+
+        <h2 class="section-title">
+            전세 조건
+        </h2>
+
+
+        <div class="input-group">
+
+            <label for="jeonseDeposit">
+                전세보증금
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="jeonseDeposit"
+                    value="200000000"
+                    min="0"
+                    step="100000"
+                >
+
+                <span class="unit">원</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="jeonseLoan">
+                전세대출금
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="jeonseLoan"
+                    value="100000000"
+                    min="0"
+                    step="100000"
+                >
+
+                <span class="unit">원</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="jeonseRate">
+                전세대출 연 이자율
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="jeonseRate"
+                    value="4"
+                    min="0"
+                    step="0.01"
+                >
+
+                <span class="unit">%</span>
+
+            </div>
+
+        </div>
+
+
+        <h2 class="section-title">
+            월세 조건
+        </h2>
+
+
+        <div class="input-group">
+
+            <label for="monthlyDeposit">
+                월세 보증금
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="monthlyDeposit"
+                    value="30000000"
+                    min="0"
+                    step="100000"
+                >
+
+                <span class="unit">원</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="monthlyRent">
+                월세
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="monthlyRent"
+                    value="700000"
+                    min="0"
+                    step="10000"
+                >
+
+                <span class="unit">원/월</span>
+
+            </div>
+
+        </div>
+
+
+        <h2 class="section-title">
+            자금 조건
+        </h2>
+
+
+        <div class="input-group">
+
+            <label for="opportunityRate">
+                내 자금의 연 수익률
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="opportunityRate"
+                    value="3"
+                    min="0"
+                    step="0.01"
+                >
+
+                <span class="unit">%</span>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="calculate-button"
+            onclick="calculate()"
+        >
+            전세·월세 비교하기
+        </button>
+
+
+        <section
+            class="result"
+            id="result"
+        >
+
+            <div class="winner">
+
+                <div class="label">
+                    예상 비용이 더 낮은 방식
+                </div>
+
+                <div
+                    class="amount"
+                    id="winner"
+                >
+                    -
+                </div>
+
+                <div
+                    class="description"
+                    id="winnerDescription"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="comparison">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>항목</th>
+                            <th>전세</th>
+                            <th>월세</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>보증금</td>
+                            <td id="jeonseDepositResult">-</td>
+                            <td id="monthlyDepositResult">-</td>
+                        </tr>
+
+                        <tr>
+                            <td>대출 이자</td>
+                            <td id="jeonseInterestResult">-</td>
+                            <td>0원</td>
+                        </tr>
+
+                        <tr>
+                            <td>월세</td>
+                            <td>0원</td>
+                            <td id="monthlyRentResult">-</td>
+                        </tr>
+
+                        <tr>
+                            <td>보증금 기회비용</td>
+                            <td id="jeonseOpportunityResult">-</td>
+                            <td id="monthlyOpportunityResult">-</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>1년 예상 비용</strong></td>
+                            <td id="jeonseTotalResult">-</td>
+                            <td id="monthlyTotalResult">-</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <a
+            href="index.html"
+            class="back-link"
+        >
+            복리 계산기로 이동하기 →
+        </a>
+
+
+        <section class="info">
+
+            <h2>
+                월세와 전세는 어떻게 비교하나요?
+            </h2>
+
+            <p>
+                단순히 월세와 전세보증금만 비교하면 실제 비용 차이를
+                정확하게 판단하기 어렵습니다.
+                전세대출을 이용한다면 대출 이자를 고려해야 하고,
+                보증금으로 묶이는 자금이 있다면 그 자금의
+                기회비용도 고려할 수 있습니다.
+            </p>
+
+
+            <h2>
+                기회비용이란?
+            </h2>
+
+            <p>
+                기회비용은 특정 선택을 함으로써 포기하게 되는
+                다른 선택의 경제적 가치를 의미합니다.
+                여기서는 보증금을 다른 곳에 투자하거나 예치했을 때
+                얻을 수 있다고 가정한 수익을 단순화하여 계산합니다.
+            </p>
+
+
+            <h2>
+                계산 결과는 참고용입니다
+            </h2>
+
+            <p>
+                실제 주거 비용에는 관리비, 보증보험료,
+                중개보수, 세금, 대출 조건 등 다양한 요소가
+                추가될 수 있습니다.
+            </p>
+
+        </section>
+
+
+        <div class="notice">
+
+            본 계산기는 전세와 월세의 예상 비용을 비교하기 위한
+            참고용 도구입니다. 실제 비용과 수익률은 금융상품,
+            계약조건, 세금 및 개인 상황에 따라 달라질 수 있습니다.
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+function formatMoney(number) {
+
+    return Math.round(number).toLocaleString("ko-KR") + "원";
+
+}
+
+
+function calculate() {
+
+    const jeonseDeposit =
+        Number(
+            document.getElementById(
+                "jeonseDeposit"
+            ).value
+        );
+
+
+    const jeonseLoan =
+        Number(
+            document.getElementById(
+                "jeonseLoan"
+            ).value
+        );
+
+
+    const jeonseRate =
+        Number(
+            document.getElementById(
+                "jeonseRate"
+            ).value
+        );
+
+
+    const monthlyDeposit =
+        Number(
+            document.getElementById(
+                "monthlyDeposit"
+            ).value
+        );
+
+
+    const monthlyRent =
+        Number(
+            document.getElementById(
+                "monthlyRent"
+            ).value
+        );
+
+
+    const opportunityRate =
+        Number(
+            document.getElementById(
+                "opportunityRate"
+            ).value
+        );
+
+
+    if (
+        !Number.isFinite(jeonseDeposit) ||
+        !Number.isFinite(jeonseLoan) ||
+        !Number.isFinite(jeonseRate) ||
+        !Number.isFinite(monthlyDeposit) ||
+        !Number.isFinite(monthlyRent) ||
+        !Number.isFinite(opportunityRate)
+    ) {
+
+        alert("모든 항목을 입력해주세요.");
+        return;
+
+    }
+
+
+    if (
+        jeonseDeposit < 0 ||
+        jeonseLoan < 0 ||
+        monthlyDeposit < 0 ||
+        monthlyRent < 0
+    ) {
+
+        alert("금액은 0원 이상이어야 합니다.");
+        return;
+
+    }
+
+
+    if (jeonseLoan > jeonseDeposit) {
+
+        alert("전세대출금은 전세보증금을 초과할 수 없습니다.");
+        return;
+
+    }
+
+
+    if (
+        jeonseRate < 0 ||
+        opportunityRate < 0
+    ) {
+
+        alert("금리는 0% 이상이어야 합니다.");
+        return;
+
+    }
+
+
+    /*
+        전세 비용
+
+        전세대출 이자 +
+        대출을 제외한 보증금의 기회비용
+    */
+
+    const jeonseInterest =
+        jeonseLoan *
+        (jeonseRate / 100);
+
+
+    const jeonseOwnMoney =
+        jeonseDeposit -
+        jeonseLoan;
+
+
+    const jeonseOpportunity =
+        jeonseOwnMoney *
+        (opportunityRate / 100);
+
+
+    const jeonseTotal =
+        jeonseInterest +
+        jeonseOpportunity;
+
+
+    /*
+        월세 비용
+
+        12개월 월세 +
+        월세 보증금의 기회비용
+    */
+
+    const monthlyRentCost =
+        monthlyRent * 12;
+
+
+    const monthlyOpportunity =
+        monthlyDeposit *
+        (opportunityRate / 100);
+
+
+    const monthlyTotal =
+        monthlyRentCost +
+        monthlyOpportunity;
+
+
+    let winner;
+    let description;
+
+
+    if (jeonseTotal < monthlyTotal) {
+
+        winner = "전세";
+
+        description =
+            "입력한 조건에서는 전세의 1년 예상 비용이 더 낮습니다.";
+
+    } else if (monthlyTotal < jeonseTotal) {
+
+        winner = "월세";
+
+        description =
+            "입력한 조건에서는 월세의 1년 예상 비용이 더 낮습니다.";
+
+    } else {
+
+        winner = "비슷함";
+
+        description =
+            "입력한 조건에서는 두 방식의 예상 비용이 같습니다.";
+
+    }
+
+
+    document.getElementById(
+        "winner"
+    ).textContent =
+        winner;
+
+
+    document.getElementById(
+        "winnerDescription"
+    ).textContent =
+        description;
+
+
+    document.getElementById(
+        "jeonseDepositResult"
+    ).textContent =
+        formatMoney(jeonseDeposit);
+
+
+    document.getElementById(
+        "monthlyDepositResult"
+    ).textContent =
+        formatMoney(monthlyDeposit);
+
+
+    document.getElementById(
+        "jeonseInterestResult"
+    ).textContent =
+        formatMoney(jeonseInterest);
+
+
+    document.getElementById(
+        "monthlyRentResult"
+    ).textContent =
+        formatMoney(monthlyRentCost);
+
+
+    document.getElementById(
+        "jeonseOpportunityResult"
+    ).textContent =
+        formatMoney(jeonseOpportunity);
+
+
+    document.getElementById(
+        "monthlyOpportunityResult"
+    ).textContent =
+        formatMoney(monthlyOpportunity);
+
+
+    document.getElementById(
+        "jeonseTotalResult"
+    ).textContent =
+        formatMoney(jeonseTotal);
+
+
+    document.getElementById(
+        "monthlyTotalResult"
+    ).textContent =
+        formatMoney(monthlyTotal);
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "block";
+
+}
+
+
+window.addEventListener(
+    "DOMContentLoaded",
+    calculate
+);
+
+</script>
+
+</body>
+</html>
+```

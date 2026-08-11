@@ -1,0 +1,645 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>전세자금 계산기 | 전세대출과 월 이자 계산</title>
+
+    <meta name="description"
+          content="전세보증금, 보유자금, 전세대출 금리와 대출 비율을 입력하여 필요한 대출금과 월 이자를 계산해보세요.">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            color: #222;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 16px 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            margin: 0 0 10px;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.07);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            height: 52px;
+            border: 1px solid #d9dce3;
+            border-radius: 10px;
+            padding: 0 55px 0 15px;
+            font-size: 17px;
+            outline: none;
+            background: white;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            font-size: 14px;
+        }
+
+        .calculate-button {
+            width: 100%;
+            height: 56px;
+            border: 0;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .calculate-button:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            display: none;
+            margin-top: 28px;
+        }
+
+        .main-result {
+            padding: 24px;
+            border-radius: 14px;
+            background: #eff6ff;
+            margin-bottom: 12px;
+        }
+
+        .main-result .label {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 7px;
+        }
+
+        .main-result .amount {
+            color: #2563eb;
+            font-size: 30px;
+            font-weight: 800;
+            word-break: break-all;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .result-box {
+            padding: 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        .result-box .label {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .result-box .value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .info {
+            margin-top: 32px;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .info h2 {
+            margin: 28px 0 8px;
+            font-size: 20px;
+            color: #222;
+        }
+
+        .notice {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #777;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 12px 40px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 27px;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-result .amount {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="header">
+
+        <h1>전세자금 계산기</h1>
+
+        <p>
+            전세보증금과 보유자금, 대출 조건을 입력하고<br>
+            필요한 자금과 예상 이자 부담을 계산해보세요.
+        </p>
+
+    </header>
+
+
+    <main class="card">
+
+        <div class="input-group">
+
+            <label for="deposit">
+                전세보증금
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="deposit"
+                    value="200000000"
+                    min="0"
+                    step="100000"
+                    placeholder="예: 200000000"
+                >
+
+                <span class="unit">원</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="myMoney">
+                보유 자금
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="myMoney"
+                    value="50000000"
+                    min="0"
+                    step="100000"
+                    placeholder="예: 50000000"
+                >
+
+                <span class="unit">원</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="loanRate">
+                전세대출 연 이자율
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="loanRate"
+                    value="4"
+                    min="0"
+                    step="0.01"
+                    placeholder="예: 4"
+                >
+
+                <span class="unit">%</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label for="loanRatio">
+                대출 비율
+            </label>
+
+            <div class="input-wrapper">
+
+                <input
+                    type="number"
+                    id="loanRatio"
+                    value="80"
+                    min="0"
+                    max="100"
+                    step="1"
+                    placeholder="예: 80"
+                >
+
+                <span class="unit">%</span>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="calculate-button"
+            onclick="calculate()"
+        >
+            전세자금 계산하기
+        </button>
+
+
+        <section
+            class="result"
+            id="result"
+        >
+
+            <div class="main-result">
+
+                <div class="label">
+                    필요한 추가 자금
+                </div>
+
+                <div
+                    class="amount"
+                    id="additionalMoney"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="result-grid">
+
+                <div class="result-box">
+
+                    <div class="label">
+                        예상 전세대출금
+                    </div>
+
+                    <div
+                        class="value"
+                        id="loanAmount"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        내 자금으로 충당하는 금액
+                    </div>
+
+                    <div
+                        class="value"
+                        id="myMoneyUsed"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        예상 월 이자
+                    </div>
+
+                    <div
+                        class="value"
+                        id="monthlyInterest"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <div class="label">
+                        예상 연 이자
+                    </div>
+
+                    <div
+                        class="value"
+                        id="yearlyInterest"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <a
+            href="index.html"
+            class="back-link"
+        >
+            복리 계산기로 이동하기 →
+        </a>
+
+
+        <section class="info">
+
+            <h2>
+                전세자금 계산기란?
+            </h2>
+
+            <p>
+                전세자금 계산기는 전세보증금과 보유자금,
+                예상 전세대출 조건을 이용하여 필요한 자금과
+                대출 이자 부담을 계산하는 도구입니다.
+            </p>
+
+
+            <h2>
+                어떻게 계산하나요?
+            </h2>
+
+            <p>
+                입력한 전세보증금에 대출 비율을 적용하여
+                예상 대출 가능 금액을 계산하고,
+                대출금에 연 이자율을 적용하여 예상 월 이자와
+                연 이자를 계산합니다.
+            </p>
+
+
+            <h2>
+                추가 자금이란?
+            </h2>
+
+            <p>
+                전세보증금에서 예상 대출금과 보유자금을 제외한
+                금액입니다. 추가 자금이 0원보다 크다면
+                해당 금액만큼 추가 자금이 필요하다는 의미입니다.
+            </p>
+
+        </section>
+
+
+        <div class="notice">
+
+            본 계산기는 참고용 계산 도구입니다.
+            실제 전세대출 가능 금액과 금리는 개인의 신용도,
+            소득, 보증기관, 금융기관 및 상품 조건 등에 따라
+            달라질 수 있습니다.
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+function formatMoney(number) {
+
+    return Math.round(number).toLocaleString("ko-KR") + "원";
+
+}
+
+
+function calculate() {
+
+    const deposit =
+        Number(
+            document.getElementById("deposit").value
+        );
+
+
+    const myMoney =
+        Number(
+            document.getElementById("myMoney").value
+        );
+
+
+    const rate =
+        Number(
+            document.getElementById("loanRate").value
+        );
+
+
+    const ratio =
+        Number(
+            document.getElementById("loanRatio").value
+        );
+
+
+    if (
+        !Number.isFinite(deposit) ||
+        !Number.isFinite(myMoney) ||
+        !Number.isFinite(rate) ||
+        !Number.isFinite(ratio)
+    ) {
+
+        alert("모든 항목을 입력해주세요.");
+        return;
+
+    }
+
+
+    if (deposit < 0 || myMoney < 0) {
+
+        alert("금액은 0원 이상이어야 합니다.");
+        return;
+
+    }
+
+
+    if (rate < 0) {
+
+        alert("이자율은 0% 이상이어야 합니다.");
+        return;
+
+    }
+
+
+    if (ratio < 0 || ratio > 100) {
+
+        alert("대출 비율은 0~100% 사이로 입력해주세요.");
+        return;
+
+    }
+
+
+    const loanAmount =
+        deposit * (ratio / 100);
+
+
+    const remainingDeposit =
+        deposit - loanAmount;
+
+
+    const myMoneyUsed =
+        Math.min(
+            myMoney,
+            remainingDeposit
+        );
+
+
+    const additionalMoney =
+        Math.max(
+            0,
+            remainingDeposit - myMoney
+        );
+
+
+    const yearlyInterest =
+        loanAmount * (rate / 100);
+
+
+    const monthlyInterest =
+        yearlyInterest / 12;
+
+
+    document.getElementById(
+        "additionalMoney"
+    ).textContent =
+        formatMoney(additionalMoney);
+
+
+    document.getElementById(
+        "loanAmount"
+    ).textContent =
+        formatMoney(loanAmount);
+
+
+    document.getElementById(
+        "myMoneyUsed"
+    ).textContent =
+        formatMoney(myMoneyUsed);
+
+
+    document.getElementById(
+        "monthlyInterest"
+    ).textContent =
+        formatMoney(monthlyInterest);
+
+
+    document.getElementById(
+        "yearlyInterest"
+    ).textContent =
+        formatMoney(yearlyInterest);
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "block";
+
+}
+
+
+window.addEventListener(
+    "DOMContentLoaded",
+    calculate
+);
+
+</script>
+
+</body>
+</html>
+```
